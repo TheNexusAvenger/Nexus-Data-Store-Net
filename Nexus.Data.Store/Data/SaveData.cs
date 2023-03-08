@@ -15,7 +15,7 @@ namespace Nexus.Data.Store.Data
         /// <summary>
         /// Id of the game.
         /// </summary>
-        public long GameId { get; set; }
+        public ulong GameId { get; set; }
         
         /// <summary>
         /// Name of the DataStore to save to.

@@ -11,7 +11,7 @@ namespace Nexus.Data.Store
         /// <summary>
         /// Game id used with Roblox.
         /// </summary>
-        public readonly long GameId;
+        public readonly ulong GameId;
 
         /// <summary>
         /// Communicator used with Roblox.
@@ -36,14 +36,14 @@ namespace Nexus.Data.Store
         /// <summary>
         /// Cache of NexusDataStore instances for the data store.
         /// </summary>
-        private static readonly Dictionary<long, NexusDataStore> NexusDataStoreCache = new Dictionary<long, NexusDataStore>();
+        private static readonly Dictionary<ulong, NexusDataStore> NexusDataStoreCache = new Dictionary<ulong, NexusDataStore>();
 
         /// <summary>
         /// Creates a NexusDataStore instance.
         /// </summary>
         /// <param name="gameId">Id of the game to access DataStores.</param>
         /// <param name="apiKey">API key for Roblox Open Cloud.</param>
-        public NexusDataStore(long gameId, string apiKey)
+        public NexusDataStore(ulong gameId, string apiKey)
         {
             this.GameId = gameId;
             this.Communicator = new RobloxCommunicator();
@@ -55,7 +55,7 @@ namespace Nexus.Data.Store
         /// </summary>
         /// <param name="gameId">Id of the game to access DataStores.</param>
         /// <param name="apiKey">API key for Roblox Open Cloud.</param>
-        public static NexusDataStore Get(long gameId, string apiKey)
+        public static NexusDataStore Get(ulong gameId, string apiKey)
         {
             NexusDataStoreCacheSemaphore.Wait();
             if (!NexusDataStoreCache.ContainsKey(gameId))
@@ -108,7 +108,7 @@ namespace Nexus.Data.Store
         /// </summary>
         /// <param name="userId">User id of the Roblox user.</param>
         /// <returns>SaveData for the user.</returns>
-        public async Task<SaveData> GetSaveDataByIdAsync(long userId)
+        public async Task<SaveData> GetSaveDataByIdAsync(ulong userId)
         {
             return await this.GetDataStoreAsync("PlayerDataStore_PlayerData", "PlayerList$" + userId);
         }
