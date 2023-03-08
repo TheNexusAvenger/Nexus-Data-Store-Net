@@ -76,30 +76,37 @@ namespace Nexus.Data.Store
         /// <returns>SaveData for the DataStore name and key.</returns>
         public async Task<SaveData> GetDataStoreAsync(string dataStoreName, string dataStoreKey)
         {
-            await this._saveDataCacheSemaphore.WaitAsync();
-            if (!this._saveDataCache.ContainsKey(dataStoreName))
+            try
             {
-                this._saveDataCache[dataStoreName] = new Dictionary<string, SaveData>();
+                await this._saveDataCacheSemaphore.WaitAsync();
+                if (!this._saveDataCache.ContainsKey(dataStoreName))
+                {
+                    this._saveDataCache[dataStoreName] = new Dictionary<string, SaveData>();
+                }
+
+                if (!this._saveDataCache[dataStoreName].ContainsKey(dataStoreKey))
+                {
+                    var saveData = new SaveData()
+                    {
+                        GameId = this.GameId,
+                        DataStoreName = dataStoreName,
+                        DataStoreKey = dataStoreKey,
+                        RobloxCommunicator = this.Communicator,
+                    };
+                    await saveData.ReloadAsync();
+                    saveData.Disconnected += () =>
+                    {
+                        this._saveDataCacheSemaphore.Wait();
+                        this._saveDataCache[dataStoreName].Remove(dataStoreKey);
+                        this._saveDataCacheSemaphore.Release();
+                    };
+                    this._saveDataCache[dataStoreName][dataStoreKey] = saveData;
+                }
             }
-            if (!this._saveDataCache[dataStoreName].ContainsKey(dataStoreKey))
+            finally
             {
-                var saveData = new SaveData()
-                {
-                    GameId = this.GameId,
-                    DataStoreName = dataStoreName,
-                    DataStoreKey = dataStoreKey,
-                    RobloxCommunicator = this.Communicator,
-                };
-                await saveData.ReloadAsync();
-                saveData.Disconnected += () =>
-                {
-                    this._saveDataCacheSemaphore.Wait();
-                    this._saveDataCache[dataStoreName].Remove(dataStoreKey);
-                    this._saveDataCacheSemaphore.Release();
-                };
-                this._saveDataCache[dataStoreName][dataStoreKey] = saveData;
+                this._saveDataCacheSemaphore.Release();
             }
-            this._saveDataCacheSemaphore.Release();
             return this._saveDataCache[dataStoreName][dataStoreKey];
         }
 
