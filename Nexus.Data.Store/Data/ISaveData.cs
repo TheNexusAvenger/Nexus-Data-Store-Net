@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Nexus.Data.Store.Data
 {
@@ -27,5 +28,17 @@ namespace Nexus.Data.Store.Data
         /// <param name="value">Value to set.</param>
         /// <typeparam name="T">Type of the value to set.</typeparam>
         public void Set<T>(string key, T value) => this.SetAsync<T>(key, value).Wait();
+
+        /// <summary>
+        /// Updates multiple keys together and saves the result in one request.
+        /// Due to limitations in C#, the usage is very different
+        /// </summary>
+        /// <param name="updateFunction">Update function with the SaveData to operate on.</param>
+        public Task UpdateAsync(Action<ISaveData> updateFunction);
+
+        /// <summary>
+        /// Clears the SaveData from the parent NexusDataStore cache.
+        /// </summary>
+        public void Disconnect();
     }
 }

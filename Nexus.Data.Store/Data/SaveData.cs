@@ -40,7 +40,7 @@ namespace Nexus.Data.Store.Data
         /// <summary>
         /// Event for the SaveData being disconnected.
         /// </summary>
-        public event Action Disconnected;
+        public event Action? Disconnected;
 
         /// <summary>
         /// Reloads the data stored in the save data.

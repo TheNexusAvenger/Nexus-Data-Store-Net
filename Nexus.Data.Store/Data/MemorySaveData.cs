@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -20,13 +21,12 @@ namespace Nexus.Data.Store.Data
         public T? Get<T>(string key)
         {
             // Return default if the key doesn't exist.
-            if (!this.Values.ContainsKey(key))
+            if (!this.Values.TryGetValue(key, out var value))
             {
                 return default;
             }
 
             // Return the value.
-            var value = this.Values[key];
             if (value is JToken token)
             {
                 return token.ToObject<T>();
@@ -52,6 +52,17 @@ namespace Nexus.Data.Store.Data
             }
             return Task.CompletedTask;
         }
+        
+        /// <summary>
+        /// Updates multiple keys together and saves the result in one request.
+        /// Due to limitations in C#, the usage is very different
+        /// </summary>
+        /// <param name="updateFunction">Update function with the SaveData to operate on.</param>
+        public Task UpdateAsync(Action<ISaveData> updateFunction)
+        {
+            updateFunction.Invoke(this);
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Clears the stored save data.
@@ -59,6 +70,14 @@ namespace Nexus.Data.Store.Data
         public void Clear()
         {
             this.Values.Clear();
+        }
+        
+        /// <summary>
+        /// Clears the SaveData from the parent NexusDataStore cache.
+        /// </summary>
+        public void Disconnect()
+        {
+            // No implementation.
         }
     }
 }

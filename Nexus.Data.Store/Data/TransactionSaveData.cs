@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Nexus.Data.Store.Data
@@ -52,6 +53,17 @@ namespace Nexus.Data.Store.Data
             this.Overrides[key] = value;
             return Task.CompletedTask;
         }
+        
+        /// <summary>
+        /// Updates multiple keys together and saves the result in one request.
+        /// Due to limitations in C#, the usage is very different
+        /// </summary>
+        /// <param name="updateFunction">Update function with the SaveData to operate on.</param>
+        public Task UpdateAsync(Action<ISaveData> updateFunction)
+        {
+            updateFunction.Invoke(this);
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Applies the overrides to a dictionary of values.
@@ -66,6 +78,14 @@ namespace Nexus.Data.Store.Data
                 this._saveData.SetAsync(key, value);
             }
             return updatedKeys;
+        }
+        
+        /// <summary>
+        /// Clears the SaveData from the parent NexusDataStore cache.
+        /// </summary>
+        public void Disconnect()
+        {
+            // No implementation.
         }
     }
 }
